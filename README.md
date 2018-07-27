@@ -8,3 +8,6 @@
   - [ ] badges
   - [ ] contribution guideland
   - [ ] example
+- [ ] check Open API specification
+  - [ ] paths are compliant?
+  - [ ] methods we are checking are compliant?

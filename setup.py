@@ -8,7 +8,8 @@ setup(
     author="Aly Sivji",
     author_email="alysivji@gmail.com",
     classifiers=[
-        "Programming Language :: Python :: 3.6" "Programming Language :: Python :: 3.7"
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
     packages=find_packages(exclude=["tests"]),
     install_requires=["falcon", "apispec"],
