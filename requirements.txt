@@ -1,2 +1,4 @@
 git+git://github.com/marshmallow-code/apispec.git#master
 falcon
+pytest
+pytest-cov
