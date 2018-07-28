@@ -11,58 +11,91 @@ def spec_factory():
         return APISpec(
             title='Swagger Petstore',
             version='1.0.0',
-            description='This is a sample Petstore server.  You can find out more '
+            description=
+            'This is a sample Petstore server.  You can find out more '
             'about Swagger at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> '
             'or on irc.freenode.net, #swagger.  For this sample, you can use the api '
             'key \"special-key\" to test the authorization filters',
             plugins=[FalconPlugin(app)],
         )
+
     return _spec
 
 
 @pytest.fixture()
-def app_context():
-    class HelloResource:
-        """Greeting API.
-        ---
-        x-extension: global metadata
-        """
-        def on_get(self, req, resp):
-            """A greeting endpoint.
-            ---
-            description: get a greeting
-            responses:
-                200:
-                    description: said hi
-            """
-            return "hi"
-
-        def on_post(self, req, resp):
-            return "hi"
-
-    app = falcon.API()
-    hello_resource = HelloResource()
-    app.add_route("/hi", hello_resource)
-    return app, hello_resource
+def app():
+    falcon_app = falcon.API()
+    return falcon_app
 
 
 class TestPathHelpers:
+    def test_gettable_resource(self, app, spec_factory):
+        class HelloResource:
+            def on_get(self, req, resp):
+                """A greeting endpoint.
+                ---
+                description: get a greeting
+                responses:
+                    200:
+                        description: said hi
+                """
+                return "dummy"
 
-    def test_path_from_resource(self, app_context, spec_factory):
-        app, resource = app_context
-        spec = spec_factory(app)
-        spec.add_path(
-            resource=resource, methods=["GET"],
-            operations={'get': {'parameters': [], 'responses': {'200': {}}}},
-        )
         expected = {
             'description': 'get a greeting',
-            'responses': {200: {'description': 'said hi'}},
+            'responses': {
+                200: {
+                    'description': 'said hi'
+                }
+            },
         }
-        assert spec._paths['/hi']['get'] == expected
-        assert spec._paths['/hi']['post'] == {}
-        assert spec._paths['/hi']['x-extension'] == 'global metadata'
+        hello_resource = HelloResource()
+        app.add_route("/hi", hello_resource)
+        spec = spec_factory(app)
+        spec.add_path(resource=hello_resource)
 
+        assert spec._paths['/hi']['get'] == expected
+
+    def test_posttable_resource(self, app, spec_factory):
+        class HelloResource:
+            def on_post(self, req, resp):
+                """A greeting endpoint.
+                ---
+                description: get a greeting
+                responses:
+                    201:
+                        description: posted something
+                """
+                return "hi"
+
+        expected = {
+            'description': 'get a greeting',
+            'responses': {
+                201: {
+                    'description': 'posted something'
+                }
+            },
+        }
+        hello_resource = HelloResource()
+        app.add_route("/hi", hello_resource)
+        spec = spec_factory(app)
+        spec.add_path(resource=hello_resource)
+
+        assert spec._paths['/hi']['post'] == expected
+
+    def test_resource_with_metadata(selfself, app, spec_factory):
+        class HelloResource:
+            """Greeting API.
+            ---
+            x-extension: global metadata
+            """
+
+        hello_resource = HelloResource()
+        app.add_route("/hi", hello_resource)
+        spec = spec_factory(app)
+        spec.add_path(resource=hello_resource)
+
+        assert spec._paths['/hi']['x-extension'] == 'global metadata'
 
     # def test_path_from_method_view(self, app, spec):
     #     class HelloApi(MethodView):
