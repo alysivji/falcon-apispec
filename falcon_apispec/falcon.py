@@ -1,6 +1,6 @@
 import copy
 
-from apispec import BasePlugin, utils
+from apispec import BasePlugin, yaml_utils
 from apispec.exceptions import APISpecError
 import falcon
 
@@ -32,7 +32,7 @@ class FalconPlugin(BasePlugin):
         if resource not in resource_uri_mapping:
             raise APISpecError("Could not find endpoint for resource {0}".format(resource))
 
-        operations.update(utils.load_operations_from_docstring(resource.__doc__) or {})
+        operations.update(yaml_utils.load_operations_from_docstring(resource.__doc__) or {})
         path = resource_uri_mapping[resource]
 
         for method in falcon.constants.HTTP_METHODS:
@@ -40,7 +40,7 @@ class FalconPlugin(BasePlugin):
             method_name = "on_" + http_verb
             if hasattr(resource, method_name):
                 method = getattr(resource, method_name)
-                docstring_yaml = utils.load_yaml_from_docstring(method.__doc__)
+                docstring_yaml = yaml_utils.load_yaml_from_docstring(method.__doc__)
                 operations[http_verb] = docstring_yaml or dict()
 
         return path
