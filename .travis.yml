@@ -16,7 +16,7 @@ install:
 
 # run test
 script:
-  - python -m pytest --cov
+  - python -m pytest --cov=falcon_apispec
 
 after_success:
   - codecov
