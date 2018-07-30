@@ -9,13 +9,12 @@ from falcon_apispec import FalconPlugin
 def spec_factory():
     def _spec(app):
         return APISpec(
-            title='Swagger Petstore',
-            version='1.0.0',
-            description=
-            'This is a sample Petstore server.  You can find out more '
-            'about Swagger at <a href=\"http://swagger.wordnik.com\">http://swagger.wordnik.com</a> '
-            'or on irc.freenode.net, #swagger.  For this sample, you can use the api '
-            'key \"special-key\" to test the authorization filters',
+            title="Swagger Petstore",
+            version="1.0.0",
+            description="This is a sample Petstore server.  You can find out more "
+            'about Swagger at <a href="http://swagger.wordnik.com">http://swagger.wordnik.com</a> '
+            "or on irc.freenode.net, #swagger.  For this sample, you can use the api "
+            'key "special-key" to test the authorization filters',
             plugins=[FalconPlugin(app)],
         )
 
@@ -42,19 +41,15 @@ class TestPathHelpers:
                 return "dummy"
 
         expected = {
-            'description': 'get a greeting',
-            'responses': {
-                200: {
-                    'description': 'said hi'
-                }
-            },
+            "description": "get a greeting",
+            "responses": {200: {"description": "said hi"}},
         }
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
         spec = spec_factory(app)
         spec.add_path(resource=hello_resource)
 
-        assert spec._paths['/hi']['get'] == expected
+        assert spec._paths["/hi"]["get"] == expected
 
     def test_posttable_resource(self, app, spec_factory):
         class HelloResource:
@@ -69,19 +64,15 @@ class TestPathHelpers:
                 return "hi"
 
         expected = {
-            'description': 'get a greeting',
-            'responses': {
-                201: {
-                    'description': 'posted something'
-                }
-            },
+            "description": "get a greeting",
+            "responses": {201: {"description": "posted something"}},
         }
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
         spec = spec_factory(app)
         spec.add_path(resource=hello_resource)
 
-        assert spec._paths['/hi']['post'] == expected
+        assert spec._paths["/hi"]["post"] == expected
 
     def test_resource_with_metadata(selfself, app, spec_factory):
         class HelloResource:
@@ -95,4 +86,4 @@ class TestPathHelpers:
         spec = spec_factory(app)
         spec.add_path(resource=hello_resource)
 
-        assert spec._paths['/hi']['x-extension'] == 'global metadata'
+        assert spec._paths["/hi"]["x-extension"] == "global metadata"
