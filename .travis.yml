@@ -17,6 +17,7 @@ install:
 # run test
 script:
   - python -m pytest --cov=falcon_apispec
+  - flake8
 
 after_success:
   - codecov
