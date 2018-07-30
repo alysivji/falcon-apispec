@@ -6,7 +6,6 @@ sudo: false
 # python settings
 language: python
 python:
-  - "2.7"
   - "3.5"
   - "3.6"
 
