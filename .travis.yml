@@ -8,6 +8,7 @@ language: python
 python:
   - "3.5"
   - "3.6"
+  - "3.7"
 
 # install packages
 install:
@@ -16,7 +17,7 @@ install:
 
 # run test
 script:
-  - python -m pytest --cov
+  - python -m pytest --cov=falcon_apispec
 
 after_success:
   - codecov

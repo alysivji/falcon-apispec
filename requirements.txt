@@ -1,4 +1,4 @@
-git+git://github.com/marshmallow-code/apispec.git#master
+apispec.git>=1.0.0b1
 falcon
 pytest
 pytest-cov
