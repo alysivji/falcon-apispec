@@ -10,7 +10,7 @@
 pip install falcon-apispec
 ```
 
-Requires `apispec v1.0` (works with beta releases).
+Requires `apispec v1.0` (works with beta).
 
 ## Example Application
 
@@ -49,7 +49,9 @@ class RandomPetResource:
         pet = get_random_pet()  # returns JSON
         resp.media = pet
 
+# create instance of resource
 random_pet_resource = RandomPetResource()
+# pass into `add_route` for Falcon
 app.add_route("/random", random_pet_resource)
 
 
@@ -67,6 +69,7 @@ spec = APISpec(
 # Register entities and paths
 spec.definition('Category', schema=CategorySchema)
 spec.definition('Pet', schema=PetSchema)
+# pass created resource into `add_path` for APISpec
 spec.add_path(resource=random_pet_resource)
 ```
 
