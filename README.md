@@ -1,6 +1,6 @@
 # falcon-apispec
 
-[![Build Status](https://travis-ci.org/alysivji/falcon-apispec.svg?branch=master)](https://travis-ci.org/alysivji/falcon-apispec) [![codecov](https://codecov.io/gh/alysivji/falcon-apispec/branch/master/graph/badge.svg)](https://codecov.io/gh/alysivji/falcon-apispec) [![PyPI](https://img.shields.io/pypi/v/falcon-apispec.svg)](https://pypi.org/project/falcon-apispec/)
+[![Build Status](https://travis-ci.org/alysivji/falcon-apispec.svg?branch=master)](https://travis-ci.org/alysivji/falcon-apispec) [![codecov](https://codecov.io/gh/alysivji/falcon-apispec/branch/master/graph/badge.svg)](https://codecov.io/gh/alysivji/falcon-apispec) [![PyPI](https://img.shields.io/pypi/v/falcon-apispec.svg)](https://pypi.org/project/falcon-apispec/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 [apispec](https://github.com/marshmallow-code/apispec) plugin that generates OpenAPI specification (aka Swagger) for [Falcon](https://falconframework.org/) web applications.
 

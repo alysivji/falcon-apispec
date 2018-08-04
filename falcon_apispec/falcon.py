@@ -38,7 +38,7 @@ class FalconPlugin(BasePlugin):
         for method in falcon.constants.HTTP_METHODS:
             http_verb = method.lower()
             method_name = "on_" + http_verb
-            if hasattr(resource, method_name):
+            if getattr(resource, method_name, None) is not None:
                 method = getattr(resource, method_name)
                 docstring_yaml = yaml_utils.load_yaml_from_docstring(method.__doc__)
                 operations[http_verb] = docstring_yaml or dict()
