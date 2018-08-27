@@ -35,6 +35,11 @@ setup(
     long_description_content_type="text/markdown",
 
     url="https://github.com/alysivji/falcon-apispec",
+    project_urls={
+        "Funding": "https://falconframework.org/#sectionSupportFalconDevelopment",
+        "Source": "https://github.com/alysivji/falcon-apispec",
+        "Tracker": "https://github.com/alysivji/falcon-apispec/issues",
+    },
 
     classifiers=[
         "Intended Audience :: Developers",
