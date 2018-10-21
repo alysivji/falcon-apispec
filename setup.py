@@ -57,6 +57,7 @@ setup(
         "falcon",
     ],
     packages=find_packages(exclude=["tests", ]),
+    data_files = [("", ["LICENSE"])],
     test_suite='tests',
 
     zip_safe=False,
