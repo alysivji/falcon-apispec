@@ -10,7 +10,7 @@
 pip install falcon-apispec
 ```
 
-Requires `apispec v1.0` (works with beta).
+Requires `apispec v1.0` (works with beta). You might need to check the latest version of the [docs](https://apispec.readthedocs.io/en/latest/) for exact usage. I won't be tracking changes until `apispec` hits 1.0rc1.
 
 ## Example Application
 
