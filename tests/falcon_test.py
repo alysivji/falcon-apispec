@@ -43,7 +43,7 @@ class TestPathHelpers:
 
         expected = {
             "description": "get a greeting",
-            "responses": {'200': {"description": "said hi"}},
+            "responses": {"200": {"description": "said hi"}},
         }
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
@@ -66,7 +66,7 @@ class TestPathHelpers:
 
         expected = {
             "description": "get a greeting",
-            "responses": {'201': {"description": "posted something"}},
+            "responses": {"201": {"description": "posted something"}},
         }
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
