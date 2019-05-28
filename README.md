@@ -67,8 +67,8 @@ spec = APISpec(
 )
 
 # Register entities and paths
-spec.definition('Category', schema=CategorySchema)
-spec.definition('Pet', schema=PetSchema)
+spec.components.schema('Category', schema=CategorySchema)
+spec.components.schema('Pet', schema=PetSchema)
 # pass created resource into `path` for APISpec
 spec.path(resource=random_pet_resource)
 ```
