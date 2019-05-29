@@ -53,7 +53,7 @@ setup(
 
     install_requires=[
         "PyYAML>=3.10",
-        "apispec>=1.0.0b1",
+        "apispec<1.4",
         "falcon",
     ],
     packages=find_packages(exclude=["tests", ]),

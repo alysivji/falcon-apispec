@@ -1,5 +1,5 @@
 PyYAML>=3.10
-apispec==1.0.0b1
+apispec<1.4
 falcon
 flake8
 pytest

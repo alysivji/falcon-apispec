@@ -11,6 +11,7 @@ def spec_factory():
         return APISpec(
             title="Swagger Petstore",
             version="1.0.0",
+            openapi_version="3.0.2",
             description="This is a sample Petstore server.  You can find out more "
             'about Swagger at <a href="http://swagger.wordnik.com">http://swagger.wordnik.com</a> '
             "or on irc.freenode.net, #swagger.  For this sample, you can use the api "
@@ -42,12 +43,12 @@ class TestPathHelpers:
 
         expected = {
             "description": "get a greeting",
-            "responses": {200: {"description": "said hi"}},
+            "responses": {"200": {"description": "said hi"}},
         }
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
         spec = spec_factory(app)
-        spec.add_path(resource=hello_resource)
+        spec.path(resource=hello_resource)
 
         assert spec._paths["/hi"]["get"] == expected
 
@@ -65,16 +66,16 @@ class TestPathHelpers:
 
         expected = {
             "description": "get a greeting",
-            "responses": {201: {"description": "posted something"}},
+            "responses": {"201": {"description": "posted something"}},
         }
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
         spec = spec_factory(app)
-        spec.add_path(resource=hello_resource)
+        spec.path(resource=hello_resource)
 
         assert spec._paths["/hi"]["post"] == expected
 
-    def test_resource_with_metadata(selfself, app, spec_factory):
+    def test_resource_with_metadata(self, app, spec_factory):
         class HelloResource:
             """Greeting API.
             ---
@@ -84,6 +85,6 @@ class TestPathHelpers:
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
         spec = spec_factory(app)
-        spec.add_path(resource=hello_resource)
+        spec.path(resource=hello_resource)
 
         assert spec._paths["/hi"]["x-extension"] == "global metadata"

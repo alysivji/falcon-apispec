@@ -67,10 +67,10 @@ spec = APISpec(
 )
 
 # Register entities and paths
-spec.definition('Category', schema=CategorySchema)
-spec.definition('Pet', schema=PetSchema)
-# pass created resource into `add_path` for APISpec
-spec.add_path(resource=random_pet_resource)
+spec.components.schema('Category', schema=CategorySchema)
+spec.components.schema('Pet', schema=PetSchema)
+# pass created resource into `path` for APISpec
+spec.path(resource=random_pet_resource)
 ```
 
 ### Generated OpenAPI Spec
