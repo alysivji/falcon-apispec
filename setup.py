@@ -52,8 +52,7 @@ setup(
     keywords="falcon apispec swagger openapi specification documentation spec rest api",
 
     install_requires=[
-        "PyYAML>=3.10",
-        "apispec<1.4",
+        "apispec>=1.0",
         "falcon",
     ],
     packages=find_packages(exclude=["tests", ]),
