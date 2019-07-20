@@ -39,12 +39,11 @@ class RandomPetResource:
     def on_get(self, req, resp):
         """A cute furry animal endpoint.
         ---
-        get:
-            description: Get a random pet
-            responses:
-                200:
-                    description: A pet to be returned
-                    schema: PetSchema
+        description: Get a random pet
+        responses:
+            200:
+                description: A pet to be returned
+                schema: PetSchema
         """
         pet = get_random_pet()  # returns JSON
         resp.media = pet
