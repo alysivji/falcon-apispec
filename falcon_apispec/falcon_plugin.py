@@ -1,5 +1,5 @@
 import copy
-
+import re
 from apispec import BasePlugin, yaml_utils
 from apispec.exceptions import APISpecError
 import falcon
@@ -37,7 +37,8 @@ class FalconPlugin(BasePlugin):
         path = resource_uri_mapping[resource]
 
         if base_path is not None:
-            path = path.replace(base_path, "")
+            base_path = '/' + base_path.strip('/')
+            path = re.sub(base_path, "", path, 1)
 
         for method in falcon.constants.HTTP_METHODS:
             http_verb = method.lower()
