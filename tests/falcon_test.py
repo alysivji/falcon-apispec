@@ -12,9 +12,11 @@ def settings():
     info:
       title: Swagger Petstore
       version: 1.0.0
-      description: 'This is a sample server Petstore server. You can find out more about Swagger
-        at [https://swagger.io](https://swagger.io) or on [irc.freenode.net, #swagger](https://swagger.io/irc/).
-        For this sample, you can use the api key `special-key` to test the authorization filters.'
+      description: 'This is a sample server Petstore server. You can find out
+        more about Swagger at [https://swagger.io](https://swagger.io) or on
+        [irc.freenode.net, #swagger](https://swagger.io/irc/).
+        For this sample, you can use the api key `special-key` to test
+        the authorization filters.'
     servers:
     - url: http://localhost:{port}/{basePath}
       description: The development API server
@@ -139,7 +141,8 @@ class TestPathHelpers:
         hello_resource = HelloResource()
         app.add_route(full_path, hello_resource)
         spec = spec_factory(app)
-        base_path = settings["servers"][0]["variables"]["basePath"].get("default")
+        base_path = \
+            settings["servers"][0]["variables"]["basePath"].get("default")
         # in swagger 2 this is simply 'basePath: /v1'
         spec.path(resource=hello_resource, base_path=base_path)
 
