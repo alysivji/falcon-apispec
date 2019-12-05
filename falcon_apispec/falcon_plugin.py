@@ -26,8 +26,6 @@ class FalconPlugin(BasePlugin):
 
     def path_helper(self, operations, resource, base_path=None, **kwargs):
         """Path helper that allows passing a Falcon resource instance."""
-        # NOTE(xakiy): add base_path param for subtracting redundant basepath
-        #              in path output
         resource_uri_mapping = self._generate_resource_uri_mapping(self._app)
 
         if resource not in resource_uri_mapping:
@@ -37,6 +35,8 @@ class FalconPlugin(BasePlugin):
         path = resource_uri_mapping[resource]
 
         if base_path is not None:
+            # make sure base_path accept either with or without leading slash
+            # swagger 2 usually come with leading slash but not in openapi 3.x.x
             base_path = '/' + base_path.strip('/')
             path = re.sub(base_path, "", path, 1)
 

@@ -1,53 +1,23 @@
 import pytest
-import yaml
+
 import falcon
 from apispec import APISpec
 from falcon_apispec import FalconPlugin
 
 
 @pytest.fixture()
-def settings():
-    OPENAPI_SPEC = """
-    openapi: 3.0.2
-    info:
-      title: Swagger Petstore
-      version: 1.0.0
-      description: 'This is a sample server Petstore server. You can find out
-        more about Swagger at [https://swagger.io](https://swagger.io) or on
-        [irc.freenode.net, #swagger](https://swagger.io/irc/).
-        For this sample, you can use the api key `special-key` to test
-        the authorization filters.'
-    servers:
-    - url: http://localhost:{port}/{basePath}
-      description: The development API server
-      variables:
-        port:
-          enum:
-          - '3000'
-          - '8888'
-          default: '3000'
-        basePath:
-          default: v1
-    """
-    return yaml.safe_load(OPENAPI_SPEC)
-
-
-@pytest.fixture()
-def spec_factory(settings):
+def spec_factory():
     def _spec(app):
-        # retrieve  title, version, and openapi version
-        title = settings["info"].pop("title")
-        spec_version = settings["info"].pop("version")
-        openapi_version = settings.pop("openapi")
-        description = settings["info"].pop("description")
-
         return APISpec(
-            title=title,
-            version=spec_version,
-            openapi_version=openapi_version,
-            description=description,
+            title="Swagger Petstore",
+            version="1.0.0",
+            openapi_version="3.0.2",
+            description="This is a sample Petstore server.  You can find out "
+            'more about Swagger at <a href="https://swagger.io"> '
+            "http://swagger.wordnik.com</a> or on irc.freenode.net, #swagger."
+            'For this sample, you can use the api key "special-key" to test '
+            "the authorization filters",
             plugins=[FalconPlugin(app)],
-            **settings
         )
 
     return _spec
@@ -120,7 +90,7 @@ class TestPathHelpers:
 
         assert spec._paths["/hi"]["x-extension"] == "global metadata"
 
-    def test_unredundant_basepath_resource(self, app, spec_factory, settings):
+    def test_unredundant_basepath_resource_with_slash(self, app, spec_factory):
         class HelloResource:
             def on_get(self, req, resp):
                 """A greeting endpoint.
@@ -136,15 +106,34 @@ class TestPathHelpers:
             "description": "get a greeting",
             "responses": {"200": {"description": "said hi"}},
         }
-        full_path = "/v1/foo/v1"
-        path_expected = "/foo/v1"
         hello_resource = HelloResource()
-        app.add_route(full_path, hello_resource)
+        app.add_route("/v1/foo/v1", hello_resource)
         spec = spec_factory(app)
-        base_path = \
-            settings["servers"][0]["variables"]["basePath"].get("default")
-        # in swagger 2 this is simply 'basePath: /v1'
+        base_path = '/v1'
         spec.path(resource=hello_resource, base_path=base_path)
 
-        assert spec._paths.get(path_expected) is not None
-        assert spec._paths[path_expected]["get"] == expected
+        assert spec._paths["/foo/v1"]["get"] == expected
+
+    def test_unredundant_basepath_resource_wo_slash(self, app, spec_factory):
+        class HelloResource:
+            def on_get(self, req, resp):
+                """A greeting endpoint.
+                ---
+                description: get a greeting
+                responses:
+                    200:
+                        description: said hi
+                """
+                return "dummy"
+
+        expected = {
+            "description": "get a greeting",
+            "responses": {"200": {"description": "said hi"}},
+        }
+        hello_resource = HelloResource()
+        app.add_route("/v1/foo/v1", hello_resource)
+        spec = spec_factory(app)
+        base_path = 'v1'
+        spec.path(resource=hello_resource, base_path=base_path)
+
+        assert spec._paths["/foo/v1"]["get"] == expected
