@@ -1,5 +1,5 @@
 import copy
-
+import re
 from apispec import BasePlugin, yaml_utils
 from apispec.exceptions import APISpecError
 import falcon
@@ -22,10 +22,9 @@ class FalconPlugin(BasePlugin):
             resource = route.resource
             mapping[resource] = uri
             routes_to_check.extend(route.children)
-
         return mapping
 
-    def path_helper(self, operations, resource, **kwargs):
+    def path_helper(self, operations, resource, base_path=None, **kwargs):
         """Path helper that allows passing a Falcon resource instance."""
         resource_uri_mapping = self._generate_resource_uri_mapping(self._app)
 
@@ -35,6 +34,12 @@ class FalconPlugin(BasePlugin):
         operations.update(yaml_utils.load_operations_from_docstring(resource.__doc__) or {})
         path = resource_uri_mapping[resource]
 
+        if base_path is not None:
+            # make sure base_path accept either with or without leading slash
+            # swagger 2 usually come with leading slash but not in openapi 3.x.x
+            base_path = '/' + base_path.strip('/')
+            path = re.sub(base_path, "", path, 1)
+
         for method in falcon.constants.HTTP_METHODS:
             http_verb = method.lower()
             method_name = "on_" + http_verb
@@ -42,5 +47,4 @@ class FalconPlugin(BasePlugin):
                 method = getattr(resource, method_name)
                 docstring_yaml = yaml_utils.load_yaml_from_docstring(method.__doc__)
                 operations[http_verb] = docstring_yaml or dict()
-
         return path
