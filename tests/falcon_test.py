@@ -137,3 +137,38 @@ class TestPathHelpers:
         spec.path(resource=hello_resource, base_path=base_path)
 
         assert spec._paths["/foo/v1"]["get"] == expected
+
+    def test_path_with_suffix(self, app, spec_factory):
+        class HelloResource:
+            def on_get_hello(self):
+                """A greeting endpoint.
+                ---
+                description: get a greeting
+                responses:
+                    200:
+                        description: said hi
+                """
+                return "dummy"
+
+            def on_get(self):
+                """An invalid method.
+                ---
+                description: this should not pass
+                responses:
+                    200:
+                        description: said hi
+                """
+                return "invalid"
+
+        expected = {
+            "description": "get a greeting",
+            "responses": {"200": {"description": "said hi"}},
+        }
+
+        hello_resource_with_suffix = HelloResource()
+        app.add_route("/hi", hello_resource_with_suffix, suffix="hello")
+
+        spec = spec_factory(app)
+        spec.path(resource=hello_resource_with_suffix)
+
+        assert spec._paths["/hi"]["get"] == expected

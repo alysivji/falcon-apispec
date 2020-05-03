@@ -108,3 +108,7 @@ venv.bak/
 .vscode
 .envrc
 todo.md
+
+# PYCharm
+.idea/
+
