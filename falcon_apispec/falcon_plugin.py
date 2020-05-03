@@ -2,7 +2,6 @@ import copy
 import re
 from apispec import BasePlugin, yaml_utils
 from apispec.exceptions import APISpecError
-import falcon
 
 
 class FalconPlugin(BasePlugin):
