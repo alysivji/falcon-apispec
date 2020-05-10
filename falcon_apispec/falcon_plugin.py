@@ -2,7 +2,6 @@ import copy
 import re
 from apispec import BasePlugin, yaml_utils
 from apispec.exceptions import APISpecError
-import falcon
 
 
 class FalconPlugin(BasePlugin):
@@ -20,7 +19,17 @@ class FalconPlugin(BasePlugin):
         for route in routes_to_check:
             uri = route.uri_template
             resource = route.resource
-            mapping[resource] = uri
+            mapping[resource] = {
+                "uri": uri,
+                "methods": {}
+            }
+
+            if route.method_map:
+                for method_name, method_handler in route.method_map.items():
+                    if method_handler.__dict__.get("__module__") == "falcon.responders":
+                        continue
+                    mapping[resource]["methods"][method_name.lower()] = method_handler
+
             routes_to_check.extend(route.children)
         return mapping
 
@@ -32,7 +41,7 @@ class FalconPlugin(BasePlugin):
             raise APISpecError("Could not find endpoint for resource {0}".format(resource))
 
         operations.update(yaml_utils.load_operations_from_docstring(resource.__doc__) or {})
-        path = resource_uri_mapping[resource]
+        path = resource_uri_mapping[resource]["uri"]
 
         if base_path is not None:
             # make sure base_path accept either with or without leading slash
@@ -40,11 +49,9 @@ class FalconPlugin(BasePlugin):
             base_path = '/' + base_path.strip('/')
             path = re.sub(base_path, "", path, 1)
 
-        for method in falcon.constants.HTTP_METHODS:
-            http_verb = method.lower()
-            method_name = "on_" + http_verb
-            if getattr(resource, method_name, None) is not None:
-                method = getattr(resource, method_name)
-                docstring_yaml = yaml_utils.load_yaml_from_docstring(method.__doc__)
-                operations[http_verb] = docstring_yaml or dict()
+        methods = resource_uri_mapping[resource]["methods"]
+
+        for method_name, method_handler in methods.items():
+            docstring_yaml = yaml_utils.load_yaml_from_docstring(method_handler.__doc__)
+            operations[method_name] = docstring_yaml or dict()
         return path
