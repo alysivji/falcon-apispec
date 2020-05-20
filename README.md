@@ -4,11 +4,19 @@
 
 [apispec](https://github.com/marshmallow-code/apispec) plugin that generates OpenAPI specification (aka Swagger) for [Falcon](https://falconframework.org/) web applications.
 
+Apispec uses three sources of information. Basic information is directly given to `APISpec()`. The plugin reads information about paths from the Falcon app. Information about an object could be given by [marshmallow](https://marshmallow.readthedocs.io/en/stable/) specification
+
 ## Installation
 
 ```console
 pip install falcon-apispec
 ```
+
+Optionaly:
+```console
+pip install marshmallow
+```
+
 
 Works with `apispec v1.0+`.
 
