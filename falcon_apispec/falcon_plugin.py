@@ -10,27 +10,43 @@ class FalconPlugin(BasePlugin):
     def __init__(self, app):
         super(FalconPlugin, self).__init__()
         self._app = app
+        self.uris_returned = []
 
-    @staticmethod
-    def _generate_resource_uri_mapping(app):
+    def _generate_resource_uri_mapping(self, app):
         routes_to_check = copy.copy(app._router._roots)
+
+        if len(routes_to_check) == 0:
+            return {}
 
         mapping = {}
         for route in routes_to_check:
-            uri = route.uri_template
-            resource = route.resource
+            if route.uri_template is not None and route.uri_template not in self.uris_returned:
+                uri = route.uri_template
+                resource = route.resource
+                method_map = route.method_map
+            elif route.uri_template is None and len(route.children) != 0:
+                routes_to_check.extend(route.children)
+                continue
+            else:
+                for child in route.children:
+                    if child.uri_template not in self.uris_returned:
+                        uri = child.uri_template
+                        resource = child.resource
+                        method_map = child.method_map
+                        break
+
             mapping[resource] = {
                 "uri": uri,
                 "methods": {}
             }
 
-            if route.method_map:
-                for method_name, method_handler in route.method_map.items():
+            if method_map:
+                for method_name, method_handler in method_map.items():
                     if method_handler.__dict__.get("__module__") == "falcon.responders":
                         continue
                     mapping[resource]["methods"][method_name.lower()] = method_handler
 
-            routes_to_check.extend(route.children)
+        self.uris_returned.append(uri)
         return mapping
 
     def path_helper(self, operations, resource, base_path=None, **kwargs):
