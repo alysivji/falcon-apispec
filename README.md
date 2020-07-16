@@ -43,7 +43,7 @@ class PetSchema(Schema):
 # Create Falcon web app
 app = falcon.API()
 
-class RandomPetResource:
+class PetResource:
     def on_get(self, req, resp):
         """A cute furry animal endpoint.
         ---
@@ -56,10 +56,29 @@ class RandomPetResource:
         pet = get_random_pet()  # returns JSON
         resp.media = pet
 
+    def on_get_one(self, req, resp, pet):
+        """A cute furry animal endpoint.
+        ---
+        description: Get a random pet
+        parameters:
+            - in: path
+              name: pet
+              required: true
+              schema:
+                type: string
+        responses:
+            200:
+                description: A pet to be returned
+                schema: PetSchema
+        """
+        pet = get_pet(pet)  # returns JSON
+        resp.media = pet
+
 # create instance of resource
-random_pet_resource = RandomPetResource()
+pet_resource = PetResource()
 # pass into `add_route` for Falcon
-app.add_route("/random", random_pet_resource)
+app.add_route("/random", pet_resource)
+app.add_route("/{pet}", pet_resource, suffix="one")
 
 
 # Create an APISpec
@@ -77,7 +96,10 @@ spec = APISpec(
 spec.components.schema('Category', schema=CategorySchema)
 spec.components.schema('Pet', schema=PetSchema)
 # pass created resource into `path` for APISpec
-spec.path(resource=random_pet_resource)
+# should be passed twice so the suffix is registered
+# path should be called n + 1 times where n is the number of suffixes
+spec.path(resource=pet_resource)
+spec.path(resource=pet_resource)
 ```
 
 ### Generated OpenAPI Spec
@@ -101,7 +123,30 @@ spec.to_dict()
 #             },
 #             "description": "A pet to be returned"
 #           }
-#         },
+#         }
+#       }
+#     },
+#     "/v1/client/{team}/{client_uuid:uuid}": {
+#       "get": {
+#         "description": "A cute furry animal endpoint.",
+#         "parameters": [
+#           {
+#             "in": "path",
+#             "name": "pet",
+#             "required": true,
+#             "schema": {
+#               "type": "string"
+#             }
+#           }
+#         ],
+#         "responses": {
+#           "200": {
+#             "schema": {
+#               "$ref": "#/definitions/Pet"
+#             },
+#             "description": "A pet to be returned"
+#           }
+#         }
 #       }
 #     }
 #   },
@@ -133,7 +178,7 @@ spec.to_dict()
 #         }
 #       }
 #     }
-#   },
+#   }
 # }
 
 spec.to_yaml()

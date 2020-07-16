@@ -174,6 +174,48 @@ class TestPathHelpers:
 
         assert spec._paths["/hi"]["get"] == expected
 
+    def test_path_with_and_without_suffix(self, app, spec_factory):
+        class HelloResource:
+            def on_get_hello(self):
+                """A greeting endpoint.
+                ---
+                description: get a greeting
+                responses:
+                    200:
+                        description: said hello
+                """
+                return "dummy"
+
+            def on_get(self):
+                """A valid method.
+                ---
+                description: this should pass
+                responses:
+                    200:
+                        description: said hi
+                """
+                return "on get"
+
+        on_get_suffix_expected = {
+            "description": "get a greeting",
+            "responses": {"200": {"description": "said hello"}},
+        }
+
+        on_get_expected = {
+            "description": "this should pass",
+            "responses": {"200": {"description": "said hi"}},
+        }
+
+        hello_resource_with_suffix = HelloResource()
+        app.add_route("/hi", hello_resource_with_suffix)
+        app.add_route("/hi/{hello}", hello_resource_with_suffix, suffix="hello")
+        spec = spec_factory(app)
+        spec.path(resource=hello_resource_with_suffix)
+        spec.path(resource=hello_resource_with_suffix)
+
+        assert spec._paths["/hi/{hello}"]["get"] == on_get_suffix_expected
+        assert spec._paths["/hi"]["get"] == on_get_expected
+
     def test_resource_without_endpoint(self, app, spec_factory):
         class HelloResource:
             def on_get(self, req, resp):
