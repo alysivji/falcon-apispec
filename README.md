@@ -55,7 +55,7 @@ class PetResource:
         """
         pet = get_random_pet()  # returns JSON
         resp.media = pet
-    
+
     def on_get_one(self, req, resp, pet):
         """A cute furry animal endpoint.
         ---
@@ -98,8 +98,8 @@ spec.components.schema('Pet', schema=PetSchema)
 # pass created resource into `path` for APISpec
 # should be passed twice so the suffix is registered
 # path should be called n + 1 times where n is the number of suffixes
-spec.path(resource=random_pet_resource)
-spec.path(resource=random_pet_resource)
+spec.path(resource=pet_resource)
+spec.path(resource=pet_resource)
 ```
 
 ### Generated OpenAPI Spec
