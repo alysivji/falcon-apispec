@@ -7,18 +7,29 @@ from apispec.exceptions import APISpecError
 class FalconPlugin(BasePlugin):
     """APISpec plugin for Falcon"""
 
-    def __init__(self, app):
+    def __init__(self, app, _uri_list = []):
         super(FalconPlugin, self).__init__()
         self._app = app
+        self._uri_list = _uri_list
 
-    @staticmethod
-    def _generate_resource_uri_mapping(app):
+    def _generate_resource_uri_mapping(self, app):
         routes_to_check = copy.copy(app._router._roots)
 
         mapping = {}
         for route in routes_to_check:
-            uri = route.uri_template
-            resource = route.resource
+            if route.uri_template and route.uri_template not in self._uri_list:
+                uri = route.uri_template
+                resource = route.resource
+                self._uri_list.append(uri)
+            elif len(route.children) != 0:
+                for route in route.children:
+                    if route.uri_template not in self._uri_list:
+                        uri = route.uri_template
+                        resource = route.resource
+                        self._uri_list.append(uri)
+                        break
+                routes_to_check.extend(route.children)
+
             mapping[resource] = {
                 "uri": uri,
                 "methods": {}
@@ -30,7 +41,6 @@ class FalconPlugin(BasePlugin):
                         continue
                     mapping[resource]["methods"][method_name.lower()] = method_handler
 
-            routes_to_check.extend(route.children)
         return mapping
 
     def path_helper(self, operations, resource, base_path=None, **kwargs):
