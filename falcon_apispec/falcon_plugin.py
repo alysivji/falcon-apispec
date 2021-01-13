@@ -7,10 +7,10 @@ from apispec.exceptions import APISpecError
 class FalconPlugin(BasePlugin):
     """APISpec plugin for Falcon"""
 
-    def __init__(self, app, _uri_list = []):
+    def __init__(self, app):
         super(FalconPlugin, self).__init__()
         self._app = app
-        self._uri_list = _uri_list
+        self._uri_list = []
 
     def _generate_resource_uri_mapping(self, app):
         routes_to_check = copy.copy(app._router._roots)
