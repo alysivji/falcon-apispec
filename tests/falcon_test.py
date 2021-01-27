@@ -30,6 +30,10 @@ def app():
     return falcon_app
 
 
+class TestGenerateResourceUriMapping:
+    def test_generate_single_resource_mapping:
+        pass
+
 class TestPathHelpers:
     def test_gettable_resource(self, app, spec_factory):
         class HelloResource:
