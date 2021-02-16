@@ -152,6 +152,46 @@ spec.to_yaml()
 # tags: []
 ```
 
+
+
+### Falcon Route Suffix Support
+
+Since Falcon 2.0, a single resource may contain several responders of the same HTTP type (e.g. 2 GETs) if a suffix is added at route creation.
+
+falcon-apispec >= 0.5 supports this through multiple APISpec path registration:
+
+```python
+class SuffixedHelloResource:
+    def on_get_hello(self):
+        """A greeting endpoint.
+            ---
+            description: get a greeting
+            responses:
+                200:
+                    description: said hi
+        """
+        return "dummy_hello"
+
+    def on_get(self):
+        """Base method.
+            ---
+            description: get something
+            responses:
+                200:
+                    description: said ???
+        """
+        return "dummy"
+
+    
+suffixed_resource = SuffixedHelloResource()
+app.add_route("/say", suffixed_resource)
+app.add_route("/say/hello", suffixed_resource, suffix="hello")
+
+spec = spec_factory(app)
+spec.path(resource=suffixed_resource)  # registers on_get
+spec.path(resource=suffixed_resource, suffix="hello")  # registers on_get_hello
+```
+
 ## Contributing
 
 ### Setting Up for Local Development
