@@ -12,32 +12,30 @@ class FalconPlugin(BasePlugin):
         self._app = app
 
     @staticmethod
-    def _generate_resource_uri_mapping(app):
+    def _generate_resource_uri_mapping(app, resource):
         routes_to_check = copy.copy(app._router._roots)
 
         mapping = {}
         for route in routes_to_check:
-            uri = route.uri_template
-            resource = route.resource
-            mapping[resource] = {
-                "uri": uri,
-                "methods": {}
-            }
+            if route.resource == resource:
+                uri = route.uri_template
+                mapping[uri] = {}
 
-            if route.method_map:
-                for method_name, method_handler in route.method_map.items():
-                    if method_handler.__dict__.get("__module__") == "falcon.responders":
-                        continue
-                    mapping[resource]["methods"][method_name.lower()] = method_handler
+                if route.method_map:
+                    for method_name, method_handler in route.method_map.items():
+                        if method_handler.__dict__.get("__module__") == "falcon.responders":
+                            continue
+                        mapping[uri][method_name.lower()] = method_handler
 
             routes_to_check.extend(route.children)
         return mapping
 
     def path_helper(self, operations, resource, base_path=None, **kwargs):
         """Path helper that allows passing a Falcon resource instance."""
-        resource_uri_mapping = self._generate_resource_uri_mapping(self._app)
+        resource_uri_mapping = self._generate_resource_uri_mapping(self._app, resource)
+        print(resource_uri_mapping)
 
-        if resource not in resource_uri_mapping:
+        if not resource_uri_mapping:
             raise APISpecError("Could not find endpoint for resource {0}".format(resource))
 
         operations.update(yaml_utils.load_operations_from_docstring(resource.__doc__) or {})
