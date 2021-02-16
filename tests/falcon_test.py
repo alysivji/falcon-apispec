@@ -6,6 +6,32 @@ from apispec.exceptions import APISpecError
 from falcon_apispec import FalconPlugin
 
 
+@pytest.fixture
+def suffixed_resource():
+    class SuffixedResource:
+        def on_get_hello(self):
+            """A greeting endpoint.
+            ---
+            description: get a greeting
+            responses:
+                200:
+                    description: said hi
+            """
+            return "dummy_hello"
+
+        def on_get(self):
+            """An invalid method.
+            ---
+            description: get something
+            responses:
+                200:
+                    description: said ???
+            """
+            return "dummy"
+
+    return SuffixedResource()
+
+
 @pytest.fixture()
 def spec_factory():
     def _spec(app):
@@ -139,40 +165,62 @@ class TestPathHelpers:
 
         assert spec._paths["/foo/v1"]["get"] == expected
 
-    def test_path_with_suffix(self, app, spec_factory):
-        class HelloResource:
-            def on_get_hello(self):
-                """A greeting endpoint.
-                ---
-                description: get a greeting
-                responses:
-                    200:
-                        description: said hi
-                """
-                return "dummy"
-
-            def on_get(self):
-                """An invalid method.
-                ---
-                description: this should not pass
-                responses:
-                    200:
-                        description: said hi
-                """
-                return "invalid"
-
+    def test_path_with_suffix(self, app, spec_factory, suffixed_resource):
         expected = {
             "description": "get a greeting",
             "responses": {"200": {"description": "said hi"}},
         }
 
-        hello_resource_with_suffix = HelloResource()
-        app.add_route("/hi", hello_resource_with_suffix, suffix="hello")
+        app.add_route("/hello", suffixed_resource, suffix="hello")
 
         spec = spec_factory(app)
-        spec.path(resource=hello_resource_with_suffix)
+        spec.path(resource=suffixed_resource, suffix="hello")
 
-        assert spec._paths["/hi"]["get"] == expected
+        assert spec._paths["/hello"]["get"] == expected
+
+    def test_path_ignore_suffix(self, app, spec_factory, suffixed_resource):
+        expected = {
+            "description": "get something",
+            "responses": {"200": {"description": "said ???"}},
+        }
+
+        app.add_route("/say", suffixed_resource)
+
+        spec = spec_factory(app)
+        spec.path(resource=suffixed_resource)
+
+        assert spec._paths["/say"]["get"] == expected
+
+    def test_path_suffix_all(self, app, spec_factory, suffixed_resource):
+
+        app.add_route("/say", suffixed_resource)
+        app.add_route("/say/hello", suffixed_resource, suffix="hello")
+
+        spec = spec_factory(app)
+        spec.path(resource=suffixed_resource)
+        spec.path(resource=suffixed_resource, suffix="hello")
+
+        assert spec._paths["/say"]["get"]["description"] == "get something"
+        assert spec._paths["/say/hello"]["get"]["description"] == "get a greeting"
+
+    def test_path_multiple_routes_same_resource(self, app, spec_factory):
+        class HelloResource:
+            """Greeting API.
+            ---
+            x-extension: global metadata
+            """
+
+        hello_resource = HelloResource()
+        app.add_route("/hi", hello_resource)
+        app.add_route("/greet", hello_resource)
+
+        spec = spec_factory(app)
+        spec.path(resource=hello_resource)
+
+        assert spec._paths["/hi"]["x-extension"] == "global metadata"
+        with pytest.raises(KeyError):
+            # Limitation: one route will not be documented!!!
+            assert spec._paths["/greet"]["x-extension"] == "global metadata"
 
     def test_resource_without_endpoint(self, app, spec_factory):
         class HelloResource:

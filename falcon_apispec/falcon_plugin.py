@@ -19,8 +19,8 @@ class FalconPlugin(BasePlugin):
         for route in routes_to_check:
             uri = route.uri_template
             if route.resource == resource and ((suffix is not None and uri.endswith(suffix) is True) or suffix is None):
+                mapping[uri] = {}
                 if route.method_map:
-                    print(route.method_map)
                     methods = {}
                     for method_name, method_handler in route.method_map.items():
                         if method_handler.__dict__.get("__module__") == "falcon.responders" or \
@@ -43,18 +43,18 @@ class FalconPlugin(BasePlugin):
 
         operations.update(yaml_utils.load_operations_from_docstring(resource.__doc__) or {})
 
-        path = next(iter(resource_uri_mapping))
-        if len(resource_uri_mapping.keys()) > 1:
-            print(resource_uri_mapping)
-            raise APISpecError("More than one uri found")
+        try:
+            path = next(uri for uri, methods in resource_uri_mapping.items() if methods)
+        except StopIteration:
+            path = next(iter(resource_uri_mapping))
+
+        methods = resource_uri_mapping[path]
 
         if base_path is not None:
             # make sure base_path accept either with or without leading slash
             # swagger 2 usually come with leading slash but not in openapi 3.x.x
             base_path = '/' + base_path.strip('/')
             path = re.sub(base_path, "", path, 1)
-
-        methods = resource_uri_mapping[path]
 
         for method_name, method_handler in methods.items():
             docstring_yaml = yaml_utils.load_yaml_from_docstring(method_handler.__doc__)
