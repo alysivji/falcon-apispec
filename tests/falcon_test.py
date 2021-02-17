@@ -171,12 +171,12 @@ class TestPathHelpers:
             "responses": {"200": {"description": "said hi"}},
         }
 
-        app.add_route("/hello", suffixed_resource, suffix="hello")
+        app.add_route("/hi", suffixed_resource, suffix="hello")
 
         spec = spec_factory(app)
         spec.path(resource=suffixed_resource, suffix="hello")
 
-        assert spec._paths["/hello"]["get"] == expected
+        assert spec._paths["/hi"]["get"] == expected
 
     def test_path_ignore_suffix(self, app, spec_factory, suffixed_resource):
         expected = {
@@ -194,14 +194,14 @@ class TestPathHelpers:
     def test_path_suffix_all(self, app, spec_factory, suffixed_resource):
 
         app.add_route("/say", suffixed_resource)
-        app.add_route("/say/hello", suffixed_resource, suffix="hello")
+        app.add_route("/say/hi", suffixed_resource, suffix="hello")
 
         spec = spec_factory(app)
         spec.path(resource=suffixed_resource)
         spec.path(resource=suffixed_resource, suffix="hello")
 
         assert spec._paths["/say"]["get"]["description"] == "get something"
-        assert spec._paths["/say/hello"]["get"]["description"] == "get a greeting"
+        assert spec._paths["/say/hi"]["get"]["description"] == "get a greeting"
 
     def test_path_multiple_routes_same_resource(self, app, spec_factory):
         class HelloResource:
