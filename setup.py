@@ -56,6 +56,9 @@ setup(
         "apispec>=1.0",
         "falcon",
     ],
+    extras_require={
+        'dev': ['bump2version', 'tox', 'pytest', 'pytest-cov'],
+    },
     packages=find_packages(exclude=["tests", ]),
     test_suite='tests',
 

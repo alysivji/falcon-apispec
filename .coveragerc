@@ -1,0 +1,22 @@
+[paths]
+source =
+   falcon_apispec
+   */site-packages
+
+[run]
+branch = true
+source =
+    falcon_apispec
+    tests
+parallel = true
+
+[report]
+show_missing = true
+precision = 2
+omit = *migrations*
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+    pass
