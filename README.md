@@ -185,7 +185,7 @@ class SuffixedHelloResource:
     
 suffixed_resource = SuffixedHelloResource()
 app.add_route("/say", suffixed_resource)
-app.add_route("/say/hello", suffixed_resource, suffix="hello")
+app.add_route("/say/hi", suffixed_resource, suffix="hello")
 
 spec = spec_factory(app)
 spec.path(resource=suffixed_resource)  # registers on_get
