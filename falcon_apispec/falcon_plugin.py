@@ -18,11 +18,14 @@ class FalconPlugin(BasePlugin):
         mapping = {}
         for route in routes_to_check:
             uri = route.uri_template
+            # Filter by resource so we don't have to parse all routes + check for any existing & matching suffix
             if route.resource == resource and ((suffix is not None and uri.endswith(suffix) is True) or suffix is None):
                 mapping[uri] = {}
                 if route.method_map:
                     methods = {}
                     for method_name, method_handler in route.method_map.items():
+                        # Multiple conditions to ignore the method : falcon responder, or a method that does not
+                        # meet the suffix requirements: no suffix provided = ignore suffixed methods, and vice-versa
                         if method_handler.__dict__.get("__module__") == "falcon.responders" or \
                                 (suffix is not None and not method_handler.__name__.lower().endswith(suffix)) or \
                                 (suffix is None and not method_handler.__name__.lower().endswith(method_name.lower())):
@@ -42,6 +45,7 @@ class FalconPlugin(BasePlugin):
 
         operations.update(yaml_utils.load_operations_from_docstring(resource.__doc__) or {})
 
+        # In case multiple uri were found, keep the only one that has methods
         try:
             path = next(uri for uri, methods in resource_uri_mapping.items() if methods)
         except StopIteration:
