@@ -28,8 +28,7 @@ class FalconPlugin(BasePlugin):
                                 (suffix is None and not method_handler.__name__.lower().endswith(method_name.lower())):
                             continue
                         methods.update({method_name.lower(): method_handler})
-                    if methods:
-                        mapping[uri] = methods
+                    mapping[uri] = methods
 
             routes_to_check.extend(route.children)
         return mapping
