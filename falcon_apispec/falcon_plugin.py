@@ -18,8 +18,8 @@ class FalconPlugin(BasePlugin):
         mapping = {}
         for route in routes_to_check:
             uri = route.uri_template
-            # Filter by resource so we don't have to parse all routes + check for any existing & matching suffix
-            if route.resource == resource and ((suffix is not None and uri.endswith(suffix) is True) or suffix is None):
+            # Filter by resource so we don't have to parse all routes
+            if route.resource == resource:
                 mapping[uri] = {}
                 if route.method_map:
                     methods = {}
