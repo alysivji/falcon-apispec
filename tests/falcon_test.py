@@ -2,6 +2,7 @@ import falcon
 import pytest
 from apispec import APISpec
 from apispec.exceptions import APISpecError
+from unittest.mock import MagicMock
 
 from falcon_apispec import FalconPlugin
 
@@ -112,6 +113,22 @@ class TestPathHelpers:
 
         hello_resource = HelloResource()
         app.add_route("/hi", hello_resource)
+        spec = spec_factory(app)
+        spec.path(resource=hello_resource)
+
+        assert spec._paths["/hi"]["x-extension"] == "global metadata"
+
+    def test_resource_no_methods(self, app, spec_factory):
+        class HelloResource:
+            """Greeting API.
+            ---
+            x-extension: global metadata
+            """
+
+        hello_resource = HelloResource()
+        magic_route = MagicMock(uri_template="/hi", resource=hello_resource, method_map=[])
+        app._router._roots.append(magic_route)
+
         spec = spec_factory(app)
         spec.path(resource=hello_resource)
 
