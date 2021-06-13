@@ -2,6 +2,7 @@ import copy
 import re
 from apispec import BasePlugin, yaml_utils
 from apispec.exceptions import APISpecError
+from apispec.core import VALID_METHODS
 
 
 class FalconPlugin(BasePlugin):
@@ -11,8 +12,14 @@ class FalconPlugin(BasePlugin):
         super(FalconPlugin, self).__init__()
         self._app = app
 
-    @staticmethod
-    def _generate_resource_uri_mapping(app):
+    def init_spec(self, spec):
+        self._spec = spec
+
+    def _get_valid_methods(self):
+        return set(VALID_METHODS[self._spec.openapi_version.major])
+
+    def _generate_resource_uri_mapping(self, app):
+        valid_methods = self._get_valid_methods()
         routes_to_check = copy.copy(app._router._roots)
 
         mapping = {}
@@ -27,6 +34,8 @@ class FalconPlugin(BasePlugin):
             if route.method_map:
                 for method_name, method_handler in route.method_map.items():
                     if method_handler.__dict__.get("__module__") == "falcon.responders":
+                        continue
+                    if method_name.lower() not in valid_methods:
                         continue
                     mapping[resource]["methods"][method_name.lower()] = method_handler
 
