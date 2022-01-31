@@ -4,6 +4,7 @@ from apispec import BasePlugin, yaml_utils
 from apispec.exceptions import APISpecError
 from apispec.core import VALID_METHODS
 
+
 class FalconPlugin(BasePlugin):
     """APISpec plugin for Falcon"""
 
@@ -33,6 +34,8 @@ class FalconPlugin(BasePlugin):
             if route.method_map:
                 for method_name, method_handler in route.method_map.items():
                     if method_handler.__module__ == "falcon.responders":
+                        continue
+                    if method_name.lower() not in valid_methods:
                         continue
                     if method_name.lower() not in valid_methods:
                         continue
