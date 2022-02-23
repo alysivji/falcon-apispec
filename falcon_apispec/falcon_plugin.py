@@ -33,7 +33,9 @@ class FalconPlugin(BasePlugin):
 
             if route.method_map:
                 for method_name, method_handler in route.method_map.items():
-                    if method_handler.__dict__.get("__module__") == "falcon.responders":
+                    if method_handler.__module__ == "falcon.responders":
+                        continue
+                    if method_name.lower() not in valid_methods:
                         continue
                     if method_name.lower() not in valid_methods:
                         continue
