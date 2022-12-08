@@ -54,7 +54,7 @@ class FalconPlugin(BasePlugin):
         uri = route.uri_template
         methods = {}
         if resource_methods:
-            for method_name, method_handler in resource_methods:
+            for method_name, method_handler in resource_methods.items():
                 if method_handler.__module__ == "falcon.responders":
                     continue
                 if method_name.lower() not in valid_methods:
